@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Div Screenshot & Share</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f0f0f0;
+    }
+    #capture-this {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Capture & Share POC</h2>
+
+  <div id="capture-this">
+    <h3>🌟 Sample Card for games TOI</h3>
+    <p>Toi sample games card</p>
+    <p><strong>Date:</strong> July 8, 2025</p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button onclick="downloadImage()">📥 Download Image</button>
+    <button onclick="shareImage()">📤 Share Image</button>
+  </div>
+
+  <script>
+    async function captureDiv() {
+      const element = document.getElementById("capture-this");
+      const canvas = await html2canvas(element);
+      return canvas.toDataURL("image/png");
+    }
+
+    async function downloadImage() {
+      const dataUrl = await captureDiv();
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "screenshot.png";
+      link.click();
+    }
+
+    async function shareImage() {
+      const dataUrl = await captureDiv();
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "screenshot.png", { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: "Sample Screenshot",
+            text: "Here's a div I captured!",
+          });
+        } catch (error) {
+          alert("Sharing failed: " + error.message);
+        }
+      } else {
+        alert("Sharing not supported on this browser or device.");
+      }
+    }
+  </script>
+
+</body>
+</html>
